@@ -13,18 +13,18 @@
       "unicode_decimal": 59967
     },
     {
+      "icon_id": "401225",
+      "name": "users",
+      "font_class": "users",
+      "unicode": "e8b5",
+      "unicode_decimal": 59573
+    },
+    {
       "icon_id": "768587",
       "name": "password-b",
       "font_class": "3702mima",
       "unicode": "e66c",
       "unicode_decimal": 58988
-    },
-    {
-      "icon_id": "1199149",
-      "name": "users",
-      "font_class": "users",
-      "unicode": "a",
-      "unicode_decimal": 10
     },
     {
       "icon_id": "1727269",
