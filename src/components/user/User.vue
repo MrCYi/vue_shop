@@ -5,6 +5,7 @@
       <el-breadcrumb-item>用户管理</el-breadcrumb-item>
       <el-breadcrumb-item>用户列表</el-breadcrumb-item>
     </el-breadcrumb>
+    <!-- 内容主体 -->
     <el-card class="box-card">
       <!-- 搜索和添加 -->
       <el-row :gutter="20">
@@ -59,8 +60,14 @@
               size="mini"
               icon="el-icon-delete"
             ></el-button>
-            <el-tooltip effect="dark" content="分配" placement="top">
+            <el-tooltip
+              :enterable="false"
+              effect="dark"
+              content="分配角色"
+              placement="top"
+            >
               <el-button
+                @click="showSetRoleDialog(scope.row)"
                 type="warning"
                 size="mini"
                 icon="el-icon-setting"
@@ -83,6 +90,7 @@
       </el-pagination>
       <!-- End分页 -->
     </el-card>
+    <!-- End内容主体 -->
     <!-- 添加用户对话框 -->
     <el-dialog
       title="添加用户"
@@ -120,7 +128,12 @@
     </el-dialog>
     <!-- End添加用户对话框 -->
     <!-- 修改信息对话框 -->
-    <el-dialog title="修改用户信息" :visible.sync="editVisible" width="50%">
+    <el-dialog
+      @close="editVisibleClose"
+      title="修改用户信息"
+      :visible.sync="editVisible"
+      width="50%"
+    >
       <!-- 表单区域 -->
       <el-form
         ref="editFormRef"
@@ -140,11 +153,40 @@
       </el-form>
       <!-- 底部区域 -->
       <span slot="footer" class="dialog-footer">
-        <el-button @click="editVisibleClose">取 消</el-button>
+        <el-button @click="editVisible = false">取 消</el-button>
         <el-button type="primary" @click="editUser">确 定</el-button>
       </span>
     </el-dialog>
     <!-- End修改信息对话框 -->
+    <!-- 分配角色对话框 -->
+    <el-dialog
+      @close="setPowerClose"
+      title="分配角色"
+      :visible.sync="setPowerDialog"
+      width="50%"
+    >
+      <div>
+        <p>当前的用户: {{ this.userInfo.username }}</p>
+        <p>当前的角色: {{ this.userInfo.role_name }}</p>
+        <p>
+          分配新角色:
+          <el-select v-model="roleId" placeholder="请选择">
+            <el-option
+              v-for="item in rolesList"
+              :key="item.id"
+              :label="item.roleName"
+              :value="item.id"
+            >
+            </el-option>
+          </el-select>
+        </p>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="setPowerDialog = false">取 消</el-button>
+        <el-button type="primary" @click="setPowerClick">确 定</el-button>
+      </span>
+    </el-dialog>
+    <!-- End分配角色对话框 -->
   </div>
 </template>
 
@@ -183,6 +225,7 @@ export default {
       total: 0, //用户数据的总条数
       addVisible: false, //控制添加用户对话框的显示隐藏
       editVisible: false, //控制修改信息对话框的显示隐藏
+      setPowerDialog: false, //控制分配角色对话框的显示隐藏
       //添加用户表单信息
       addForm: {
         username: "",
@@ -219,9 +262,9 @@ export default {
           { validator: checkMoblie, trigger: "blur" },
         ],
       },
-      //添加用户表单信息
+      //编辑用户表单信息
       editMessage: {},
-      //添加用户表单信息验证规则
+      //编辑用户表单信息验证规则
       editRule: {
         email: [
           { required: true, message: "请输入邮箱", trigger: "blur" },
@@ -232,6 +275,9 @@ export default {
           { validator: checkMoblie, trigger: "blur" },
         ],
       },
+      userInfo: "",
+      rolesList: "",
+      roleId: "",
     };
   },
   methods: {
@@ -316,6 +362,7 @@ export default {
         this.$message.success("更新用户信息成功");
       });
     },
+    //删除用户
     async delClick(id) {
       const result = await this.$confirm(
         "此操作将永久删除该用户, 是否继续?",
@@ -338,9 +385,42 @@ export default {
         }
       }
     },
+    //打开分配角色对话框
+    async showSetRoleDialog(row) {
+      this.userInfo = row;
+      const { data: res } = await this.$http.get("roles");
+      if (res.meta.status !== 200) {
+        return this.$message.error("获取角色列表失败");
+      }
+      this.rolesList = res.data;
+      console.log(this.rolesList);
+      this.setPowerDialog = true;
+    },
+    //分配用户角色
+    async setPowerClick() {
+      if (!this.roleId) {
+        return this.$message.error("请选择要设置角色");
+      }
+      const { data: res } = await this.$http.put(
+        `users/${this.userInfo.id}/role`,
+        {
+          rid: this.roleId,
+        }
+      );
+      if (res.meta.status !== 200) {
+        console.log(res);
+        return this.$message.error("设置角色失败");
+      }
+      this.$message.success(res.meta.msg);
+      this.getUserList();
+      this.setPowerDialog = false;
+    },
+    setPowerClose() {
+      this.rolesList = "";
+      this.roleId = "";
+    },
   },
 };
 </script>
 
-<style lang="less" scoped>
-</style>
+<style lang="less" scoped></style>
