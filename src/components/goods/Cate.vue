@@ -7,6 +7,7 @@
       <el-breadcrumb-item>商品分类</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- End面包屑导航 -->
+
     <!-- 内容主体 -->
     <el-card class="box-card">
       <!-- 添加分类按钮 -->
@@ -18,6 +19,7 @@
         </el-col>
       </el-row>
       <!-- End添加分类按钮 -->
+
       <!-- 分类表格区域 -->
       <el-table
         :data="cateList"
@@ -64,6 +66,7 @@
         </el-table-column>
       </el-table>
       <!-- End分类表格区域 -->
+
       <!-- 分页区域 -->
       <el-pagination
         @size-change="handleSizeChange"
@@ -78,6 +81,7 @@
       <!-- End分页区域 -->
     </el-card>
     <!-- End内容主体 -->
+
     <!-- 添加分类对话框区域 -->
     <el-dialog
       @close="addCateDialogClose"
@@ -116,6 +120,7 @@
       </span>
     </el-dialog>
     <!-- End添加分类对话框区域 -->
+
     <!-- 编辑对话框区域 -->
     <el-dialog
       @close="editDialogClose"
